@@ -1,0 +1,42 @@
+.PHONY: all clean run
+.SUFFIXES: .java .class .so
+
+SWI_HOME=/usr/lib/swi-prolog
+JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun
+
+
+all: libjpx.so
+
+clean:
+	@echo "Cleaning up"
+	@rm -f *.o
+	@rm -f libjpx.so 
+
+libjpx.so: engine.o $(SWI_HOME)/lib/i386/libpl.a
+	@echo "Building $@"
+	@$(CC) \
+		-fPIC \
+		-lgmp \
+		-ldl \
+		-lreadline \
+		-lncurses \
+		-lm \
+		-lrt \
+		-shared \
+		-o $@ $^
+
+setup:
+	@echo "Fetching required runtime files"
+	@cp $(SWI_HOME)/bin/plterm.dll .
+	@cp $(SWI_HOME)/bin/libpl.dll .
+	@cp $(SWI_HOME)/bin/pthreadVC.dll .
+
+.c.o:
+	@echo "Compiling $<"
+	@$(CC) \
+		-I$(JAVA_HOME)/include \
+		-I$(JAVA_HOME)/include/linux \
+		-I$(SWI_HOME)/include \
+		-I../include \
+		-c $<
+

@@ -1,0 +1,39 @@
+.PHONY: all clean run
+.SUFFIXES: .java .class .dylib
+
+SWI_HOME=/Users/stefan/Projects/ice/swipl
+JAVA_HOME=`/usr/libexec/java_home`
+
+
+all: libjpx.dylib
+
+clean:
+	@echo "Cleaning up"
+	@rm -f *.o
+	@rm -f libjpx.dylib 
+
+libjpx.dylib: engine.o 
+	@echo "Building $@"
+	@$(CC) \
+		-dynamiclib \
+		-fPIC \
+		-L$(SWI_HOME)/lib/i386-darwin16.7.0 \
+		-lpl \
+		-lgmp \
+		-ldl \
+		-lreadline \
+		-lncurses \
+		-lm \
+		-o $@ $^
+	install_name_tool -change "/usr/local/lib/swipl-5.8.0/lib/i386-darwin16.7.0/libpl.dylib" libpl.dylib libjpx.dylib
+
+.c.o:
+	@echo "Compiling $<"
+	@$(CC) \
+		-Wall -pedantic -std=gnu99 \
+		-I$(JAVA_HOME)/include \
+		-I$(JAVA_HOME)/include/darwin \
+		-I$(SWI_HOME)/include \
+		-I../java/include \
+		-c $<
+

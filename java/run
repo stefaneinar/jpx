@@ -1,0 +1,2 @@
+LD_PRELOAD=libjpx.dylib java -Djava.library.path=. -cp JPX.jar Test
+

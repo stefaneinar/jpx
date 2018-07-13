@@ -1,0 +1,68 @@
+
+<project name="JPX" default="dist" basedir=".">
+
+	<property name="src"     location="src"/>
+	<property name="build"   location="build"/>
+	<property name="dist"    location="dist"/>
+	<property name="include" location="../include"/>
+	<property name="docs"    location="docs"/>
+
+
+	<target name="init">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${include}"/>
+	</target>
+
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${build}">
+			<classpath>
+				<pathelement path="${build}"/>
+				<pathelement location="bsh.jar"/>
+			</classpath>
+		</javac>
+	</target>
+
+
+	<target name="javah" depends="compile">
+		<javah classpath="${build}" outputFile="${include}/JPX.h">
+			<class name="jpx.JPX"/>
+			<class name="jpx.impl.AtomImpl"/>
+			<class name="jpx.impl.CompoundImpl"/>
+			<class name="jpx.impl.IntegerImpl"/>
+			<class name="jpx.impl.QueryImpl"/>
+			<class name="jpx.impl.VariableImpl"/>
+			<class name="jpx.impl.TermImpl"/>
+		</javah>
+	</target>
+
+	<target name="javadoc" depends="compile">
+		<javadoc packagenames="jpx.*"
+			excludepackagenames="jpx.impl.*"
+			sourcepath="src"
+			destdir="docs/api"
+			author="true"
+			version="true"
+			windowTitle="JPX Api"/>
+	</target>
+
+	<target name="dist" depends="compile,javah,javadoc">
+
+		<jar destfile="JPX.jar">
+			<fileset dir="${build}"/>
+			<manifest>
+				<attribute name="Main-Class" value="Main"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${include}"/>
+		<delete dir="${docs}"/>
+	</target>
+
+</project>
+
